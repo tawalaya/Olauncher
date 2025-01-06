@@ -20,7 +20,7 @@
         android:id="@+id/messageLayout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="?attr/dialogShadeColor"
+        android:background="@android:color/transparent"
         android:clickable="true"
         android:clipToPadding="false"
         android:focusable="true"

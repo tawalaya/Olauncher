@@ -153,4 +153,10 @@
     <string name="alignment_changed">Alignment changed ✅</string>
     <string name="home_screen">Home screen</string>
     <string name="hey">Hey</string>
+    <string name="view_0">0</string>
+    <string name="view_1">1</string>
+    <string name="view_2">2</string>
+    <string name="home_views">Number of Homes</string>
+    <string name="only_change_wallpaper">Change Lockscreen wallpaper</string>
+    <string name="default_home_view">⚪️</string>
 </resources>

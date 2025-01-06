@@ -131,21 +131,10 @@ private fun upgradeHiddenApps(prefs: Prefs) {
     prefs.hiddenAppsUpdated = true
 }
 
-fun isPackageInstalled(context: Context, packageName: String, userString: String): Boolean {
+fun isPackageInstalled(context: Context, packageName: String): Boolean {
     val launcher = context.getSystemService(Context.LAUNCHER_APPS_SERVICE) as LauncherApps
-    val activityInfo = launcher.getActivityList(packageName, getUserHandleFromString(context, userString))
-    if (activityInfo.size > 0) return true
-    return false
-}
-
-fun getUserHandleFromString(context: Context, userHandleString: String): UserHandle {
-    val userManager = context.getSystemService(Context.USER_SERVICE) as UserManager
-    for (userHandle in userManager.userProfiles) {
-        if (userHandle.toString() == userHandleString) {
-            return userHandle
-        }
-    }
-    return android.os.Process.myUserHandle()
+    val activityInfo = launcher.getActivityList(packageName, android.os.Process.myUserHandle())
+    return activityInfo.size > 0
 }
 
 fun isOlauncherDefault(context: Context): Boolean {
@@ -204,12 +193,18 @@ fun getChangedAppTheme(context: Context, currentAppTheme: Int): Int {
     }
 }
 
-fun openAppInfo(context: Context, userHandle: UserHandle, packageName: String) {
+fun openAppInfo(context: Context, userHandle: UserHandle?, packageName: String) {
     val launcher = context.getSystemService(Context.LAUNCHER_APPS_SERVICE) as LauncherApps
     val intent: Intent? = context.packageManager.getLaunchIntentForPackage(packageName)
 
+    var user = userHandle;
+    if(userHandle == null){
+        user = android.os.Process.myUserHandle()
+    }
+
     intent?.let {
-        launcher.startAppDetailsActivity(intent.component, userHandle, null, null)
+        launcher.startAppDetailsActivity(intent.component, user, null, null)
+        launcher.startAppDetailsActivity(intent.component, user, null, null)
     } ?: context.showToast(context.getString(R.string.unable_to_open_app))
 }
 
@@ -261,7 +256,7 @@ suspend fun getWallpaperBitmap(originalImage: Bitmap, width: Int, height: Int): 
     }
 }
 
-suspend fun setWallpaper(appContext: Context, url: String): Boolean {
+suspend fun setWallpaper(appContext: Context, url: String, changeLockScreen: Boolean?): Boolean {
     return withContext(Dispatchers.IO) {
         val originalImageBitmap = getBitmapFromURL(url) ?: return@withContext false
         if (appContext.resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE && isTablet(appContext).not())
@@ -273,7 +268,9 @@ suspend fun setWallpaper(appContext: Context, url: String): Boolean {
 
         try {
             wallpaperManager.setBitmap(scaledBitmap, null, false, WallpaperManager.FLAG_SYSTEM)
-            wallpaperManager.setBitmap(scaledBitmap, null, false, WallpaperManager.FLAG_LOCK)
+            if(changeLockScreen == true) {
+                wallpaperManager.setBitmap(scaledBitmap, null, false, WallpaperManager.FLAG_LOCK)
+            }
         } catch (e: Exception) {
             return@withContext false
         }

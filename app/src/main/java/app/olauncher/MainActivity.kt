@@ -2,6 +2,7 @@ package app.olauncher
 
 import android.annotation.SuppressLint
 import android.app.Activity
+import android.app.WallpaperManager
 import android.content.Context
 import android.content.Intent
 import android.content.pm.ActivityInfo
@@ -34,6 +35,7 @@ import app.olauncher.helper.shareApp
 import app.olauncher.helper.showLauncherSelector
 import app.olauncher.helper.showToast
 import java.util.Calendar
+
 
 class MainActivity : AppCompatActivity() {
 
@@ -75,8 +77,17 @@ class MainActivity : AppCompatActivity() {
         viewModel.getAppList()
         setupOrientation()
 
-        window.addFlags(FLAG_LAYOUT_NO_LIMITS)
+//        window.addFlags(FLAG_LAYOUT_NO_LIMITS)
+//        val wm = WallpaperManager.getInstance(applicationContext)
+//        val wallpaperManager = WallpaperManager.getInstance(this)
+//        val wallpaperDrawable = wallpaperManager.drawable
+//        binding.mainActivityLayout.background = wallpaperDrawable
     }
+
+    companion object {
+        private const val ICON_DIALOG_TAG = "icon-dialog"
+    }
+
 
     override fun onStop() {
         backToHomeScreen()

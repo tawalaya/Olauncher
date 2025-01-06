@@ -7,7 +7,6 @@ import android.content.ComponentName
 import android.content.Context
 import android.content.pm.LauncherApps
 import android.os.UserHandle
-import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
@@ -33,6 +32,7 @@ import java.util.concurrent.TimeUnit
 
 
 class MainViewModel(application: Application) : AndroidViewModel(application) {
+
     private val appContext by lazy { application.applicationContext }
     private val prefs = Prefs(appContext)
 
@@ -62,66 +62,43 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             }
 
             Constants.FLAG_SET_HOME_APP_1 -> {
-                prefs.appName1 = appModel.appLabel
-                prefs.appPackage1 = appModel.appPackage
-                prefs.appUser1 = appModel.user.toString()
-                prefs.appActivityClassName1 = appModel.activityClassName
+                prefs.updateApp(0,appModel)
+
                 refreshHome(false)
             }
 
             Constants.FLAG_SET_HOME_APP_2 -> {
-                prefs.appName2 = appModel.appLabel
-                prefs.appPackage2 = appModel.appPackage
-                prefs.appUser2 = appModel.user.toString()
-                prefs.appActivityClassName2 = appModel.activityClassName
+                prefs.updateApp(1,appModel)
                 refreshHome(false)
             }
 
             Constants.FLAG_SET_HOME_APP_3 -> {
-                prefs.appName3 = appModel.appLabel
-                prefs.appPackage3 = appModel.appPackage
-                prefs.appUser3 = appModel.user.toString()
-                prefs.appActivityClassName3 = appModel.activityClassName
+                prefs.updateApp(2,appModel)
                 refreshHome(false)
             }
 
             Constants.FLAG_SET_HOME_APP_4 -> {
-                prefs.appName4 = appModel.appLabel
-                prefs.appPackage4 = appModel.appPackage
-                prefs.appUser4 = appModel.user.toString()
-                prefs.appActivityClassName4 = appModel.activityClassName
+                prefs.updateApp(3,appModel)
                 refreshHome(false)
             }
 
             Constants.FLAG_SET_HOME_APP_5 -> {
-                prefs.appName5 = appModel.appLabel
-                prefs.appPackage5 = appModel.appPackage
-                prefs.appUser5 = appModel.user.toString()
-                prefs.appActivityClassName5 = appModel.activityClassName
+                prefs.updateApp(4,appModel)
                 refreshHome(false)
             }
 
             Constants.FLAG_SET_HOME_APP_6 -> {
-                prefs.appName6 = appModel.appLabel
-                prefs.appPackage6 = appModel.appPackage
-                prefs.appUser6 = appModel.user.toString()
-                prefs.appActivityClassName6 = appModel.activityClassName
+                prefs.updateApp(5,appModel)
                 refreshHome(false)
             }
 
             Constants.FLAG_SET_HOME_APP_7 -> {
-                prefs.appName7 = appModel.appLabel
-                prefs.appPackage7 = appModel.appPackage
-                prefs.appUser7 = appModel.user.toString()
-                prefs.appActivityClassName7 = appModel.activityClassName
+                prefs.updateApp(6,appModel)
                 refreshHome(false)
             }
 
             Constants.FLAG_SET_HOME_APP_8 -> {
-                prefs.appName8 = appModel.appLabel
-                prefs.appPackage8 = appModel.appPackage
-                prefs.appUser8 = appModel.user.toString()
-                prefs.appActivityClassName8 = appModel.activityClassName
+                prefs.updateApp(7,appModel)
                 refreshHome(false)
             }
 
@@ -171,7 +148,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         updateSwipeApps.postValue(Unit)
     }
 
-    private fun launchApp(packageName: String, activityClassName: String?, userHandle: UserHandle) {
+    private fun launchApp(packageName: String, activityClassName: String?, userHandle: UserHandle?) {
         val launcher = appContext.getSystemService(Context.LAUNCHER_APPS_SERVICE) as LauncherApps
         val activityInfo = launcher.getActivityList(packageName, userHandle)
 

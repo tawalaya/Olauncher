@@ -4,6 +4,7 @@ import android.app.admin.DevicePolicyManager
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
+import android.opengl.Visibility
 import android.os.Build
 import android.os.Bundle
 import android.os.Process
@@ -68,11 +69,13 @@ class SettingsFragment : Fragment(), View.OnClickListener, View.OnLongClickListe
         checkAdminPermission()
 
         binding.homeAppsNum.text = prefs.homeAppsNum.toString()
+        binding.homeViewNum.text = prefs.numHomes.toString()
         populateProMessage()
         populateKeyboardText()
         populateScreenTimeOnOff()
         populateLockSettings()
         populateWallpaperText()
+        populateOnlyWallpaperText()
         populateAppThemeText()
         populateTextSize()
         populateAlignment()
@@ -103,8 +106,10 @@ class SettingsFragment : Fragment(), View.OnClickListener, View.OnLongClickListe
             R.id.toggleLock -> toggleLockMode()
             R.id.autoShowKeyboard -> toggleKeyboardText()
             R.id.homeAppsNum -> binding.appsNumSelectLayout.visibility = View.VISIBLE
+            R.id.homeViewNum -> binding.homeNumSelectLayout.visibility = View.VISIBLE
             R.id.dailyWallpaperUrl -> requireContext().openUrl(prefs.dailyWallpaperUrl)
             R.id.dailyWallpaper -> toggleDailyWallpaperUpdate()
+            R.id.onlyWallpaper -> toggleOnlyWallpaper()
             R.id.alignment -> binding.alignmentSelectLayout.visibility = View.VISIBLE
             R.id.alignmentLeft -> viewModel.updateHomeAlignment(Gravity.START)
             R.id.alignmentCenter -> viewModel.updateHomeAlignment(Gravity.CENTER)
@@ -136,6 +141,10 @@ class SettingsFragment : Fragment(), View.OnClickListener, View.OnLongClickListe
             R.id.maxApps7 -> updateHomeAppsNum(7)
             R.id.maxApps8 -> updateHomeAppsNum(8)
 
+            R.id.maxHome1 -> updateHomeViewNum(1)
+            R.id.maxHome2 -> updateHomeViewNum(2)
+            R.id.maxHome3 -> updateHomeViewNum(3)
+
             R.id.textSize1 -> updateTextSizeScale(Constants.TextSize.ONE)
             R.id.textSize2 -> updateTextSizeScale(Constants.TextSize.TWO)
             R.id.textSize3 -> updateTextSizeScale(Constants.TextSize.THREE)
@@ -165,6 +174,15 @@ class SettingsFragment : Fragment(), View.OnClickListener, View.OnLongClickListe
             R.id.github -> requireContext().openUrl(Constants.URL_OLAUNCHER_GITHUB)
             R.id.privacy -> requireContext().openUrl(Constants.URL_OLAUNCHER_PRIVACY)
             R.id.footer -> requireContext().openUrl(Constants.URL_PLAY_STORE_DEV)
+        }
+    }
+
+    private fun toggleOnlyWallpaper() {
+        prefs.changeLockScreen = ! prefs.changeLockScreen
+        if (prefs.changeLockScreen) {
+            binding.onlyWallpaper.text = getString(R.string.on)
+        } else {
+            binding.onlyWallpaper.text = getString(R.string.off)
         }
     }
 
@@ -199,9 +217,11 @@ class SettingsFragment : Fragment(), View.OnClickListener, View.OnLongClickListe
         binding.autoShowKeyboard.setOnClickListener(this)
         binding.toggleLock.setOnClickListener(this)
         binding.homeAppsNum.setOnClickListener(this)
+        binding.homeViewNum.setOnClickListener(this)
         binding.screenTimeOnOff.setOnClickListener(this)
         binding.dailyWallpaperUrl.setOnClickListener(this)
         binding.dailyWallpaper.setOnClickListener(this)
+        binding.onlyWallpaper.setOnClickListener(this);
         binding.alignment.setOnClickListener(this)
         binding.alignmentLeft.setOnClickListener(this)
         binding.alignmentCenter.setOnClickListener(this)
@@ -243,6 +263,11 @@ class SettingsFragment : Fragment(), View.OnClickListener, View.OnLongClickListe
         binding.maxApps7.setOnClickListener(this)
         binding.maxApps8.setOnClickListener(this)
 
+        binding.maxHome1.setOnClickListener(this)
+        binding.maxHome2.setOnClickListener(this)
+        binding.maxHome3.setOnClickListener(this)
+
+
         binding.textSize1.setOnClickListener(this)
         binding.textSize2.setOnClickListener(this)
         binding.textSize3.setOnClickListener(this)
@@ -252,6 +277,7 @@ class SettingsFragment : Fragment(), View.OnClickListener, View.OnLongClickListe
         binding.textSize7.setOnClickListener(this)
 
         binding.dailyWallpaper.setOnLongClickListener(this)
+        binding.onlyWallpaper.setOnLongClickListener(this)
         binding.alignment.setOnLongClickListener(this)
         binding.appThemeText.setOnLongClickListener(this)
         binding.swipeLeftApp.setOnLongClickListener(this)
@@ -437,9 +463,13 @@ class SettingsFragment : Fragment(), View.OnClickListener, View.OnLongClickListe
         prefs.dailyWallpaper = !prefs.dailyWallpaper
         populateWallpaperText()
         if (prefs.dailyWallpaper) {
+            binding.onlyWallpaperSelector.visibility = View.VISIBLE
             viewModel.setWallpaperWorker()
             showWallpaperToasts()
-        } else viewModel.cancelWallpaperWorker()
+        } else {
+            binding.onlyWallpaperSelector.visibility = View.GONE
+            viewModel.cancelWallpaperWorker()
+        }
     }
 
     private fun showWallpaperToasts() {
@@ -456,6 +486,13 @@ class SettingsFragment : Fragment(), View.OnClickListener, View.OnLongClickListe
         viewModel.refreshHome(true)
     }
 
+    private fun updateHomeViewNum(num: Int) {
+        binding.homeViewNum.text = num.toString()
+        binding.homeNumSelectLayout.visibility = View.GONE
+        prefs.numHomes = num
+        prefs.switchHome(num) //Just to be save
+        viewModel.refreshHome(true)
+    }
     private fun updateTextSizeScale(sizeScale: Float) {
         if (prefs.textSizeScale == sizeScale) return
         prefs.textSizeScale = sizeScale
@@ -536,6 +573,15 @@ class SettingsFragment : Fragment(), View.OnClickListener, View.OnLongClickListe
     private fun populateWallpaperText() {
         if (prefs.dailyWallpaper) binding.dailyWallpaper.text = getString(R.string.on)
         else binding.dailyWallpaper.text = getString(R.string.off)
+    }
+
+    private fun populateOnlyWallpaperText(){
+        binding.onlyWallpaperSelector.visibility = if(prefs.dailyWallpaper) {View.VISIBLE} else {View.GONE}
+        if(prefs.changeLockScreen){
+            binding.onlyWallpaper.text = getString(R.string.on)
+        } else{
+            binding.onlyWallpaper.text = getString(R.string.off)
+        }
     }
 
     private fun updateHomeBottomAlignment() {
