@@ -101,7 +101,7 @@ class Prefs(context: Context) : SharedPreferences.OnSharedPreferenceChangeListen
     }
 
     fun switchHome(newIndex:Int){
-        if(newIndex in 0..2) {
+        if(newIndex in 1..3) {
             currentHome = newIndex
             loadHomeView(newIndex)
         }
@@ -291,9 +291,7 @@ class Prefs(context: Context) : SharedPreferences.OnSharedPreferenceChangeListen
                 this.remove("APP_${currentHome}_$location")
             }
         }
-    }
-
-    fun getAppName(location: Int): String {
+    }    fun getAppName(location: Int): String {
         return getApp(location)?.appLabel ?: ""
     }
 
