@@ -45,11 +45,13 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     val isOlauncherDefault = MutableLiveData<Boolean>()
     val launcherResetFailed = MutableLiveData<Boolean>()
     val homeAppAlignment = MutableLiveData<Int>()
-    val screenTimeValue = MutableLiveData<String>()
+    val viewPagerScreen = MutableLiveData(0)
 
     val showDialog = SingleLiveEvent<String>()
     val checkForMessages = SingleLiveEvent<Unit?>()
     val resetLauncherLiveData = SingleLiveEvent<Unit?>()
+    val setViewPagerCurrentItem = SingleLiveEvent<Int>()
+    val screenTimeValue = MutableLiveData<String>()
 
     fun selectedApp(appModel: AppModel, flag: Int) {
         when (flag) {
@@ -194,6 +196,10 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     fun isOlauncherDefault() {
         isOlauncherDefault.value = isOlauncherDefault(appContext)
+    }
+
+    fun viewPagerCurrentScreen(screen: Int) {
+        viewPagerScreen.value = screen
     }
 
 //    fun resetDefaultLauncherApp(context: Context) {

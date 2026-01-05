@@ -10,9 +10,8 @@ import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
-import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import androidx.recyclerview.widget.RecyclerView.Recycler
+import androidx.recyclerview.widget.LinearLayoutManager
 import app.olauncher.MainViewModel
 import app.olauncher.R
 import app.olauncher.data.AppModel
@@ -64,6 +63,7 @@ class AppDrawerFragment : Fragment() {
         initAdapter()
         initObservers()
         initClickListeners()
+        viewModel.getAppList()
     }
 
     private fun initViews() {
@@ -113,8 +113,10 @@ class AppDrawerFragment : Fragment() {
                 if (it.appPackage.isEmpty())
                     return@AppDrawerAdapter
                 viewModel.selectedApp(it, flag)
-                if (flag == Constants.FLAG_LAUNCH_APP || flag == Constants.FLAG_HIDDEN_APPS)
-                    findNavController().popBackStack(R.id.mainFragment, false)
+                if (flag == Constants.FLAG_LAUNCH_APP)
+                    viewModel.setViewPagerCurrentItem.postValue(Constants.ViewPager.HOME_SCREEN)
+                else if (flag == Constants.FLAG_HIDDEN_APPS)
+                    findNavController().popBackStack(R.id.homeFragment, false)
                 else
                     findNavController().popBackStack()
             },
@@ -124,7 +126,6 @@ class AppDrawerFragment : Fragment() {
                     it.user,
                     it.appPackage
                 )
-                findNavController().popBackStack(R.id.mainFragment, false)
             },
             appDeleteListener = {
                 requireContext().apply {
@@ -154,7 +155,7 @@ class AppDrawerFragment : Fragment() {
                     binding.search.hideKeyboard()
                     prefs.firstHide = false
                     viewModel.showDialog.postValue(Constants.Dialog.HIDDEN)
-                    findNavController().navigate(R.id.action_appListFragment_to_settingsFragment2)
+                    findNavController().navigate(R.id.action_mainFragment_to_settingsFragment)
                 }
                 viewModel.getAppList()
                 viewModel.getHiddenApps()
@@ -168,7 +169,7 @@ class AppDrawerFragment : Fragment() {
         linearLayoutManager = object : LinearLayoutManager(requireContext()) {
             override fun scrollVerticallyBy(
                 dx: Int,
-                recycler: Recycler,
+                recycler: RecyclerView.Recycler,
                 state: RecyclerView.State,
             ): Int {
                 val scrollRange = super.scrollVerticallyBy(dx, recycler, state)
@@ -183,9 +184,9 @@ class AppDrawerFragment : Fragment() {
         binding.recyclerView.adapter = adapter
         binding.recyclerView.addOnScrollListener(getRecyclerViewOnScrollListener())
         binding.recyclerView.itemAnimator = null
-        if (requireContext().isEinkDisplay().not())
-            binding.recyclerView.layoutAnimation =
-                AnimationUtils.loadLayoutAnimation(requireContext(), R.anim.layout_anim_from_bottom)
+//        if (requireContext().isEinkDisplay().not())
+//            binding.recyclerView.layoutAnimation =
+//                AnimationUtils.loadLayoutAnimation(requireContext(), R.anim.layout_anim_from_bottom)
     }
 
     private fun initObservers() {
@@ -208,6 +209,13 @@ class AppDrawerFragment : Fragment() {
                     adapter.filter.filter(binding.search.query)
                 }
             }
+        }
+
+        viewModel.viewPagerScreen.observe(viewLifecycleOwner) {
+            if (it == Constants.ViewPager.HOME_SCREEN)
+                binding.search.setQuery("", false)
+            else if (it == Constants.ViewPager.APP_DRAWER && binding.search.query.toString().isBlank())
+                binding.search.showKeyboard(prefs.autoShowKeyboard)
         }
     }
 
@@ -237,7 +245,7 @@ class AppDrawerFragment : Fragment() {
                     prefs.updateApp(flag, app)
                 }
             }
-            findNavController().popBackStack()
+            viewModel.setViewPagerCurrentItem.postValue(Constants.ViewPager.HOME_SCREEN)
         }
     }
 
@@ -269,14 +277,9 @@ class AppDrawerFragment : Fragment() {
     }
 
     private fun checkMessageAndExit() {
-        findNavController().popBackStack()
+        viewModel.setViewPagerCurrentItem.postValue(Constants.ViewPager.HOME_SCREEN)
         if (flag == Constants.FLAG_LAUNCH_APP)
             viewModel.checkForMessages.call()
-    }
-
-    override fun onStart() {
-        super.onStart()
-        binding.search.showKeyboard(prefs.autoShowKeyboard)
     }
 
     override fun onStop() {

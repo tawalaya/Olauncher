@@ -75,7 +75,7 @@
     <string name="rate_us_message">Hi, you won\'t see this message again.
         \n\nIf you\'re finding Olauncher useful, could you please leave a 5-star review? It\'ll mean the world to us. Thank you!</string>
     <string name="share_message">We need your help! We want to tell every Android user about the benefits of Olauncher but we can\'t do it alone.
-         \n\nCould you please share Olauncher with your friends, family and followers? That\'d be very helpful. Thanks!</string>
+             \n\nCould you please share Olauncher with your friends, family and followers? That\'d be very helpful. Thanks!</string>
     <!--    <string name="share_message">Your monthly reminder - you should use your phone, not the other way round. Stay strong. You\'re doing great!-->
     <!--         \n\nIf you have a moment to spare, could you please share Olauncher with others? Olauncher needs people. More importantly, people need Olauncher.</string>-->
     <string name="keyboard_message">Hi, keyboard is the fastest way to find and launch apps in Olauncher. Can we request you to keep this On for a few more days and then decide?
@@ -159,4 +159,6 @@
     <string name="home_views">Number of Homes</string>
     <string name="only_change_wallpaper">Change Lockscreen wallpaper</string>
     <string name="default_home_view">⚪️</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

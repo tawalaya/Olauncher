@@ -252,6 +252,8 @@ class MainActivity : AppCompatActivity() {
         binding.messageLayout.visibility = View.GONE
         if (navController.currentDestination?.id != R.id.mainFragment)
             navController.popBackStack(R.id.mainFragment, false)
+        else
+            viewModel.setViewPagerCurrentItem.postValue(Constants.ViewPager.HOME_SCREEN)
     }
 
     private fun setPlainWallpaper() {
